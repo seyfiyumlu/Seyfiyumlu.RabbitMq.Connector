@@ -15,7 +15,7 @@
     <Company>seyfiyumlu</Company>
     <Description>A Net.Core Client For RabbitMq</Description>
     <PackageTags>RabbitMQ;Middleware;ASPNETCore</PackageTags>
-    <PackageProjectUrl>  </PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/seyfiyumlu/Seyfiyumlu.RabbitMq.Connector</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>

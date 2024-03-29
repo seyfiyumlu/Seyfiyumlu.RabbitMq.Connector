@@ -80,3 +80,5 @@ services.AddSingleton<IRabbitMqService, RabbitMqService>(sp =>
 ```c#
 app.UseMiddleware<RabbitMqConnectorMiddleware>();
 ```
+
+Thank you.

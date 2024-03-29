@@ -27,10 +27,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="LICENSE.txt" Pack="true" PackagePath=""/>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath=""/>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Readme.md" Pack="true" PackagePath="" /> 
+    <None Include="..\..\Readme.md" Pack="true" PackagePath="" /> 
   </ItemGroup>
 
   <ItemGroup>

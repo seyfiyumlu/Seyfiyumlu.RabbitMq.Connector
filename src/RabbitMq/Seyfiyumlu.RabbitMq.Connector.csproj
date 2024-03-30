@@ -10,7 +10,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>RabbitMQClientLibrary</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3.1</Version>
     <Authors>SeyfettinYUMLU</Authors>
     <Company>seyfiyumlu</Company>
     <Description>A Net.Core Client For RabbitMq</Description>

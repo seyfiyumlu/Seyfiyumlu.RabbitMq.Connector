@@ -26,7 +26,7 @@ public class ClientConnectorTests : BaseTest
     }
 
     [Fact]
-    public async void ShouldPublishMessage()
+    public async void ShouldPublishMessageList()
     {
         _rabbitMqService.TryConnect();
 
@@ -42,6 +42,20 @@ public class ClientConnectorTests : BaseTest
             }
         };
         await _serverMessageQueuePublisher.SendListAsync(userList);
+    }
+
+    [Fact]
+    public async void ShouldPublishMessage()
+    {
+        _rabbitMqService.TryConnect();
+        await _serverMessageQueuePublisher.SendAsync(new UserMessage
+        {
+            ChatId = 870351599,
+            MessageText = "905305220794",
+            MsgTypeID = 0,
+            CreateDate = DateTime.Now,
+            SentDate = DateTime.Now
+        });
     }
 
 }

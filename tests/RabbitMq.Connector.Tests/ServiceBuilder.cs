@@ -56,21 +56,7 @@ public static class ServiceBuilder
 
     public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var rabbitMqConfig = new RabbitMqConfiguration
-        {
-            Host = "127.0.0.1",
-            Port = 5672,
-            Username = "guest",
-            Password = "guest",
-            Heartbeat = 30,
-            ClusterUrls = ["127.0.0.1"],
-            ConnectionName = "TestApp",
-            ConsumerExchangeName = "TestAppExchange",
-            ConsumerQueueName = "TestAppQueue",
-            PublisherExchangeName = "PublishAppExchange",
-            PublisherQueueName = "PublishAppQueue",
-            RetryCount = 3
-        };
+
 
         var rabbitMqConfig = configuration.GetSection(nameof(RabbitMqConfiguration)).Get<RabbitMqConfiguration>();
         services.AddSingleton<RabbitMqConfiguration>(rabbitMqConfig);

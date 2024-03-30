@@ -59,6 +59,28 @@ var rabbitMqConfig = new RabbitMqConfiguration
 
 Then create a consumer class or publisher class based on `RabbitMqPublisherBase<T> ` T is model class of message exchange.
 
+## Create a publisher class
+
+```c#
+public class ServerMessageQueuePublisher : RabbitMqPublisherBase<UserMessage>
+{
+    public ServerMessageQueuePublisher(RabbitMqConfiguration rabbitMqConfigOptions,
+            ILogger<RabbitMqPublisherBase<UserMessage>> logger, IRabbitMqService rabbitMQPersistentConnection)
+        : base(logger, rabbitMQPersistentConnection, rabbitMqConfigOptions.PublisherQueueName,
+            rabbitMqConfigOptions.PublisherExchangeName)
+    {
+    }
+}
+
+///message exchange class
+public class UserMessage
+{
+    public string? UserId { get; set; }
+    public string? UserName { get; set; }
+    public string? Message { get; set; }
+}
+```
+
 Add this class into the DI container.
 
 ```c#

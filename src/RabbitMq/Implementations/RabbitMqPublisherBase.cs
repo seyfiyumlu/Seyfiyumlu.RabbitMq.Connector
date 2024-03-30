@@ -82,6 +82,7 @@ public abstract class RabbitMqPublisherBase<T>
         {
             using (var channel = _rabbitMQPersistentConnection.CreateModel())
             {
+                _rabbitMQPersistentConnection.CreateQueue(channel, _exchange, _queue);
                 var properties = channel.CreateBasicProperties();
                 properties.DeliveryMode = 2; // persistent
 

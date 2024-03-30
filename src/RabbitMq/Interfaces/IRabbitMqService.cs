@@ -10,4 +10,6 @@ public interface IRabbitMqService : IDisposable
 
     IModel CreateModel();
     IConnection CreateChannel();
+
+    void CreateQueue(IModel model, string exchangeName, string queueName);
 }

@@ -29,6 +29,7 @@ public class ClientConnectorTests : BaseTest
     public async void ShouldPublishMessage()
     {
         _rabbitMqService.TryConnect();
+
         var userList = new List<UserMessage>
         {
             new UserMessage

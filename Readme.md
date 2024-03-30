@@ -81,26 +81,102 @@ public class UserMessage
 }
 ```
 
-Add this class into the DI container.
+## Create a consumer class
 
 ```c#
-services.AddSingleton<RabbitMqConfiguration>(rabbitMqConfig);
-services.AddScoped<ServerMessageQueuePublisher>();
-```
-
-Then add `IRabbitMqService` with logger and configuration
-
-```c#
-services.AddSingleton<IRabbitMqService, RabbitMqService>(sp =>
+public class ServerMessageQueueConsumer : RabbitMqSubscriberBase<UserMessage>
 {
-    var logger = sp.GetRequiredService<ILogger<RabbitMqService>>();
-    var config = sp.GetRequiredService<IOptions<RabbitMqConfiguration>>().Value;
-    return new RabbitMqService(config, logger);
-});
+    public ServerMessageQueueConsumer(RabbitMqConfiguration rabbitMqConfigOptions,
+            ILogger<RabbitMqSubscriberBase<UserMessage>> logger, IRabbitMqService rabbitMQPersistentConnection)
+        : base(logger, rabbitMQPersistentConnection, rabbitMqConfigOptions.ConsumerQueueName,
+            rabbitMqConfigOptions.ConsumerExchangeName)
+    {
+    }
+
+    public async override Task HandleMessage(UserMessage message)
+    {
+        Console.WriteLine($"Message Received: {message.Message}");
+    }
+}
 ```
 
+## Startup.cs
+
+Add methods below into the Startup.cs.
+
 ```c#
-app.UseMiddleware<RabbitMqConnectorMiddleware>();
+    private void AddRabbitMq(IServiceCollection services, IConfiguration configuration)
+    {
+        var rabbitMqConfig = configuration.GetSection("RabbitMqConfiguration").Get<RabbitMqConfiguration>();
+        services.Configure<RabbitMqConfiguration>(configuration.GetSection("RabbitMqConfiguration"));
+        services.AddSingleton<RabbitMqConfiguration>(rabbitMqConfig);
+        services.AddSingleton<IRabbitMqService, RabbitMqService>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<RabbitMqService>>();
+            var config = sp.GetRequiredService<IOptions<RabbitMqConfiguration>>().Value;
+            return new RabbitMqService(config, logger);
+        });
+    }
+
+    private void AddRabbitMqPublisher(IServiceCollection services)
+    {
+        services.AddScoped<ServerMessageQueuePublisher>();
+    }
+    private void AddRabbitMqConsumer(IServiceCollection services)
+    {
+        services.AddHostedService<ServerMessageQueueConsumer>();
+    }
+
+```
+
+## ConfigureServices :
+
+```c#
+    AddRabbitMq(context.Services, configuration);
+    AddRabbitMqPublisher(context.Services);
+    AddRabbitMqConsumer(context.Services);
+```
+
+## Then Use Middleware into the app builder
+
+```c#
+app.UseRabbitMqConnector();
+```
+
+## Usage :
+
+- Consumer :
+  In ServerMessageQueueConsumer class has coming with an abstract method named : HandleMessage. you can use this method to process messages from queue.
+
+```c#
+    public async override Task HandleMessage(UserMessage message)
+    {
+        Console.WriteLine($"Message Received: {message.Message}");
+    }
+```
+
+- Publisher :
+  Use DI for use the publisher class.
+
+```c#
+private readonly ServerMessageQueuePublisher _serverMessageQueuePublisher;
+
+public Dashboard(ServerMessageQueuePublisher serverMessageQueuePublisher)
+{
+    _serverMessageQueuePublisher = serverMessageQueuePublisher;
+}
+
+///you can use this part any of your code.
+var message = new UserMessage();
+message = new UserMessage
+{
+    UserId = "1", // "1" is the admin user id, it should be fetched from the current user's id
+    UserName = "admin",
+    Message = "Dashboard page is visited"
+};
+
+await _serverMessageQueuePublisher.SendAsync(message);
+
 ```
 
 Thank you.

@@ -32,7 +32,7 @@ public abstract class RabbitMqSubscriberBase<T> : BackgroundService
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         stoppingToken.ThrowIfCancellationRequested();
-        CreateChannel(_queue);
+        CreateChannel(_queue, _exchange);
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.Received += ConsumerReceived;
         _channel.BasicConsume(_queue, false, consumer);
@@ -66,7 +66,7 @@ public abstract class RabbitMqSubscriberBase<T> : BackgroundService
 
     public abstract Task HandleMessage(T message);
 
-    private void CreateChannel(string queue)
+    private void CreateChannel(string queue, string exchangeName)
     {
         var policy = Policy.Handle<Exception>()
             .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
@@ -83,7 +83,7 @@ public abstract class RabbitMqSubscriberBase<T> : BackgroundService
             }
 
             _channel = _rabbitMQPersistentConnection.CreateModel();
-            _rabbitMQPersistentConnection.CreateQueue(_channel, queue, queue);
+            _rabbitMQPersistentConnection.CreateQueue(_channel, exchangeName, queue);
             //_channel.QueueDeclare(queue: queue, durable: true, exclusive: false, autoDelete: false,arguments: null);
             _channel.BasicQos(0, 5, false);
             _logger.LogInformation($"RabbitMq  {_channelId} Channel Opened!");

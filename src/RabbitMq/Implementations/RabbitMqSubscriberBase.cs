@@ -15,16 +15,18 @@ public abstract class RabbitMqSubscriberBase<T> : BackgroundService
 {
     private readonly IRabbitMqService _rabbitMQPersistentConnection;
     private readonly string _queue;
+    private readonly string _exchange;
     private readonly Guid _channelId;
     private readonly ILogger<RabbitMqSubscriberBase<T>> _logger;
     private IModel _channel;
 
-    public RabbitMqSubscriberBase(ILogger<RabbitMqSubscriberBase<T>> logger, IRabbitMqService rabbitMQPersistentConnection, string queue)
+    public RabbitMqSubscriberBase(ILogger<RabbitMqSubscriberBase<T>> logger, IRabbitMqService rabbitMQPersistentConnection, string queue, string exchange)
     {
         _logger = logger;
         _rabbitMQPersistentConnection = rabbitMQPersistentConnection;
         _queue = queue;
         _channelId = Guid.NewGuid();
+        _exchange = exchange;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -81,8 +83,8 @@ public abstract class RabbitMqSubscriberBase<T> : BackgroundService
             }
 
             _channel = _rabbitMQPersistentConnection.CreateModel();
-            _channel.QueueDeclare(queue: queue, durable: true, exclusive: false, autoDelete: false,
-                arguments: null);
+            _rabbitMQPersistentConnection.CreateQueue(_channel, queue, queue);
+            //_channel.QueueDeclare(queue: queue, durable: true, exclusive: false, autoDelete: false,arguments: null);
             _channel.BasicQos(0, 5, false);
             _logger.LogInformation($"RabbitMq  {_channelId} Channel Opened!");
         });

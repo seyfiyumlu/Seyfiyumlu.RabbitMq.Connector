@@ -66,10 +66,12 @@ public static class ServiceBuilder
         // services.AddHostedService<SubscriberService>();
         services.AddHostedService<TestApp>(sp =>
         {
-            return new TestApp(sp.GetRequiredService<ServerMessageQueuePublisher>(), rabbitMqConfig);
+            return new TestApp(sp.GetRequiredService<ServerMessageQueuePublisher>(), rabbitMqConfig,
+                                sp.GetRequiredService<ServerMessageQueueConsumer>());
         });
 
         services.AddScoped<ServerMessageQueuePublisher>();
+        services.AddScoped<ServerMessageQueueConsumer>();
     }
 
 }

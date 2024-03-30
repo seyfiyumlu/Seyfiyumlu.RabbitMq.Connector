@@ -55,6 +55,15 @@ public class RabbitMqService : IRabbitMqService
         return _connection.CreateModel();
     }
 
+    public void CreateQueue(IModel model, string exchangeName, string queueName)
+    {
+        model.QueueDeclare(queueName, durable: true, exclusive: false, autoDelete: false);
+        model.ExchangeDeclare(exchangeName, ExchangeType.Fanout, durable: true, autoDelete: false);
+        model.QueueBind(queueName, exchangeName, string.Empty);
+
+    }
+
+
     public IConnection CreateChannel()
     {
         ConnectionFactory connection = new ConnectionFactory()
